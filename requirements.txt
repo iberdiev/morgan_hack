@@ -1,0 +1,14 @@
+asgiref==3.5.2
+defusedxml==0.7.1
+Django==4.1.1
+django-cors-headers==3.13.0
+django-rest-auth==0.9.5
+djangorestframework==3.14.0
+fonttools==4.37.4
+fpdf2==2.5.7
+Pillow==9.2.0
+pytz==2022.2.1
+reportlab==3.6.11
+six==1.16.0
+sqlparse==0.4.3
+svg.path==6.2
