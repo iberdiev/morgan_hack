@@ -12,11 +12,13 @@ from . models import get_grid_from_test, ImageTable, TestReport
 import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from reportlab.lib.pagesizes import letter
+
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-# from braces.views import CsrfExemptMixin
-
-
+from django.core.mail import send_mail
+from morgan_hack.settings import EMAIL_HOST_USER
 
 # Create your views here.
 class TestTableView(APIView):
@@ -71,7 +73,9 @@ def generate_pdf(request):
     report_lines = report_obj.report.replace('\r', '').split('\n')
     
     buffer = io.BytesIO()
-    p = canvas.Canvas(buffer)
+    p = canvas.Canvas(buffer, pagesize = letter)
+    template = ImageReader('./report_templates/1.png')
+    p.drawImage(template,10,10,mask='auto')
     
     p.drawString(100, 800, f"Name: {report_obj.user_name}")
     p.drawString(100,770, f"Email: {report_obj.email}")
@@ -90,3 +94,8 @@ def generate_pdf(request):
     FileResponse()
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
+def send_activation_email():
+        subject = "New entry"
+        message = f"Hope you will enjoy our platform!\nActivate your account: http://localhost:8080/profile/activation/?code="
+        send_mail(subject, message, EMAIL_HOST_USER, [EMAIL_HOST_USER], fail_silently=False)
+        print("OK!")
