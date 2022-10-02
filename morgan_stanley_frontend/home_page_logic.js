@@ -19,7 +19,7 @@ class HomePage {
                         </p>
     
                         <div class="">
-                            <a href="./test1_page.html?test_id=${obj.pk}"
+                            <a href="./test${obj.pk}_page.html?test_id=${obj.pk}"
                             ><button type="button" class="btn btn-primary">
                                 Start test
                             </button></a

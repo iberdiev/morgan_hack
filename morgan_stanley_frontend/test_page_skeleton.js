@@ -90,7 +90,7 @@ class TestPage {
             this.chosen.push(element.id)
         }
 
-        Page.SELECTED.forEach(elem => 
+        TestPage.SELECTED.forEach(elem => 
             event.target.classList.toggle(elem)
         )
 
