@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Admin Page</title>
+</head>
+<body>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Create Grid
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel" >Test Generation Settings</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group mt-lg-4">
+                        <label for="gridSizeX">Grid Size: </label>
+                        <div class="row">
+                            <div class="col">
+                                <input type="number" class="form-control" id="gridSizeX" placeholder="20">
+                            </div>
+                            <div>
+                                X
+                            </div>
+                            <div class="col">
+                                <input type="number" class="form-control" id="gridSizeY" placeholder="10"  min="10" max="25">
+                            </div>
+                          </div>
+                        <small id="gridSizeHelp" class="form-text text-muted">Write the grid size in number of rows by number of columns format</small>
+                    </div>
+            
+                    <div class="form-group mt-lg-4">
+                        <div class="row">
+                          <label for="gridFilling"> Grid Filling:  </label>
+                          <br></br>
+                          <div class="col-sm-10">
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="randomized" checked>
+                              <label class="form-check-label" for="gridRadios1">
+                                Randomized
+                              </label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="custom">
+                              <label class="form-check-label" for="gridRadios2">
+                                Custom
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Start Generation</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+    
+</body>
+</html>
