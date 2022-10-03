@@ -64,26 +64,29 @@
 
 
     <div class="container m-5">
-        <form class="row g-3">
+        <p class="lead fw-bolder">
+          Please fill out the form!
+        </p>
+        <form class="user_form row g-3">
             <div class="col-md-12">
                 <label for="inputName" class="form-label">Full name</label>
-                <input type="password" class="form-control" id="inputName">
+                <input type="text" class="form-value form-control" id="name" required>
               </div>
             <div class="col-md-12">
               <label for="inputEmail4" class="form-label">Email</label>
-              <input type="email" class="form-control" id="inputEmail4">
+              <input type="email" class="form-value form-control" id="email" required>
             </div>
             <div class="col-12">
               <label for="inputPhone" class="form-label">Phone num 1</label>
-              <input type="text" class="form-control" id="inputAddress" placeholder="+36 20 324 32 43">
+              <input type="text" class="form-value form-control" id="phone1" placeholder="+36 20 324 32 43" required>
             </div>
             <div class="col-12">
               <label for="inputPhone" class="form-label">Phone num 2</label>
-              <input type="text" class="form-control" id="inputAddress2" placeholder="+36 20 231 23 43">
+              <input type="text" class="form-value form-control" id="phone2" placeholder="+36 20 231 23 43">
             </div>
             <div class="col-md-12">
               <label for="inputState" class="form-label">Gender</label>
-              <select id="inputState" class="form-select">
+              <select id="gender" class="form-value form-select">
                 <option selected>Prefer not to say</option>
                 <option>Male</option>
                 <option>Female</option>
@@ -91,7 +94,7 @@
             </div>
             <div class="col-12">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="gridCheck">
+                <input class="form-value form-check-input" type="checkbox" id="remember_me">
                 <label class="form-check-label" for="gridCheck">
                   Remember me
                 </label>
@@ -102,5 +105,11 @@
             </div>
           </form>
     </div>
+
+    <script src="./constants.js"></script>
+    <script src="./utils/timer.js"></script>
+    <script src="./events/events.js"></script>
+    <script src="./rest_handlers.js"></script>
+    <script src="./form_page_logic.js"></script>
 </body>
 </html>

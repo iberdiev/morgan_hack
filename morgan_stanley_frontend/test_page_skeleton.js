@@ -17,7 +17,16 @@ class TestPage {
         // Catch the event thrown by timer
         document.addEventListener("getInfo", () => {
             this.countIncorrectAndRevised();
+            if(this.currentIndex == 2) {
+                this.saveValuesAndRedirectToFormPage();
+            }
         });
+    }
+
+    saveValuesAndRedirectToFormPage() {
+        localStorage.setItem('data', JSON.stringify(this.data));
+        localStorage.setItem('time_finish', JSON.stringify({minute: this.timer.getTimeInMinutes(), second: this.timer.getTimeInSeconds()}));
+        window.location.replace("./form_page.html");
     }
 
     countIncorrectAndRevised() {

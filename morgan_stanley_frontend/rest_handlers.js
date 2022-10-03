@@ -1,5 +1,20 @@
 class RestApiHandler {
 
+    /**
+     * EXAMPLE POST METHOD
+     * 
+     * 
+     * 
+     * postData('https://example.com/answer', { answer: 42 })
+     * .then((response) => response.blob())
+     .then((data) => {
+        console.log(data); // JSON data parsed by `data.json()` call
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+    */
     static async postData(url = '', data = {}) {
         // Default options are marked with *
         const response = await fetch(url, {
@@ -30,18 +45,5 @@ class RestApiHandler {
     static getName() {
         console.log("Hello world");
     }
-
-
 }
 
-/**
- * postData('https://example.com/answer', { answer: 42 })
- * .then((response) => response.blob())
-  .then((data) => {
-    console.log(data); // JSON data parsed by `data.json()` call
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
-
- */
