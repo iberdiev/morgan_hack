@@ -22,11 +22,11 @@ class TestTwoPage extends TestPage {
     generateGrid() {
         let grid_html = '';
         for(let row=0;row<20;++row) {
-            grid_html += `<div class="row gx-0 mb-${(row+1) % 5 == 0 ? '5' : '1'}">`
+            grid_html += `<div class="row mb-${(row+1) % 5 == 0 ? '5' : '1'}">`
             for(let col=0;col<20;++col) {
-                grid_html += `<div class="col">
-                            <img id="${row}_${col}" src="https://picsum.photos/48/48" class="" alt="...">
-                            </div>`;
+                grid_html += `<div class="col gx-1 gy-1">
+                                <img id="${row}_${col}" src="https://picsum.photos/48/48" class="" alt="..."> 
+                              </div>`;
     
                 // if(this.answers.includes(this.grid[row][col])) {
                 //     this.correct_cells.push(`${row}_${col}`);

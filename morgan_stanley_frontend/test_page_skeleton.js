@@ -1,7 +1,7 @@
 
 class TestPage {
 
-    static SELECTED = 'selected border border-5 border-success'.split(" ");
+    static SELECTED = 'selected border-selected'.split(" ");
 
     constructor() {
         this.data = {}
@@ -13,18 +13,22 @@ class TestPage {
         this.chosen = [];
         this.currentMaxRevised = {row: 0, col: 0};
         this.gridArea = document.querySelector('.grid_area');
+        this.finish_button = document.querySelector('.finish_button');
+        this.finish_button.addEventListener('click', this.saveValuesAndRedirectToFormPage.bind(this));
         
         // Catch the event thrown by timer
         document.addEventListener("getInfo", () => {
-            this.countIncorrectAndRevised();
-            if(this.currentIndex == 2) {
+            if(this.currentIndex == 5) {
                 this.saveValuesAndRedirectToFormPage();
             }
+            this.countIncorrectAndRevised();
         });
     }
 
     saveValuesAndRedirectToFormPage() {
+        this.countIncorrectAndRevised();
         localStorage.setItem('data', JSON.stringify(this.data));
+        console.log(this.timer);
         localStorage.setItem('time_finish', JSON.stringify({minute: this.timer.getTimeInMinutes(), second: this.timer.getTimeInSeconds()}));
         window.location.replace("./form_page.html");
     }

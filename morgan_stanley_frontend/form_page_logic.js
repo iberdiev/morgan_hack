@@ -1,28 +1,30 @@
 class FormPage {
+    #userData = {};
+
     constructor() {
-        this.userData = {};
+        this.#userData = {};
         this.formElement = document.querySelector('.user_form');
         this.formValues = document.querySelectorAll('.form-value');
-        this.formElement.addEventListener('submit', this.onFormSubmit.bind(this));
+        this.formElement.addEventListener('submit', this.#onFormSubmit.bind(this));
     }
 
-    onFormSubmit(event) {
+    #onFormSubmit(event) {
         event.preventDefault();
-        this.getUserData();
-        this.packUserData();
-        console.log(this.userData);
+        this.#getUserData();
+        this.#packUserData();
+        console.log(this.#userData);
     }
 
-    getUserData() {
-        this.formValues.forEach(e => this.userData[e.id] = e.value);
+    #getUserData () {
+        this.formValues.forEach(e => this.#userData[e.id] = e.value);
     }
 
-    packUserData() {
+    #packUserData() {
         const testData = JSON.parse(localStorage.getItem('data'));
         const timeFinished = JSON.parse(localStorage.getItem('time_finish'));
 
-        this.userData['testData'] = testData;
-        this.userData['timeFinished'] = timeFinished;
+        this.#userData['testData'] = testData;
+        this.#userData['timeFinished'] = timeFinished;
     }
 
     #sendUserData() {

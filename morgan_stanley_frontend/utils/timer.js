@@ -58,7 +58,6 @@ class Timer {
 
     getTimeInMinutes() {
         return Math.floor((this.getTime() / 1000) / 60);
-
     }
 
     getTimeInSeconds() {
