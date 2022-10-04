@@ -1,8 +1,11 @@
+from email.policy import default
+from enum import unique
+from xmlrpc.client import Boolean
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from django.forms import CharField
-
+import time 
 # Create your models here.
 def get_grid_from_test(test):
     return [row.split(',') for row in test.grid.replace(' ', '').split('\r\n')]
@@ -69,3 +72,7 @@ def pre_save_user(sender, instance, **kwargs):
     if not valid:
         raise Exception('OMG')
 
+
+class TestToken(models.Model):
+    test_token = models.CharField(unique=True, blank=False, null=False, max_length=200)
+    valid = models.BooleanField(default=True)

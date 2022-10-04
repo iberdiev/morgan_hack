@@ -145,3 +145,6 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "unimarket.elte@gmail.com"
 EMAIL_HOST_PASSWORD = "ofjssarojksoedxe"
+
+
+ORIGIN_IP = "http://10.149.244.24:8000/"

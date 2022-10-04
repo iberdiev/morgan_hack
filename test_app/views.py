@@ -1,11 +1,12 @@
 import code
 from email import message
+from tokenize import Token
 from django.http import HttpResponse
 from multiprocessing.dummy import active_children
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_auth.views import APIView
-from . models import TestTable, TestReport
+from . models import TestTable, TestReport, TestToken
 from . serializers import TestTableSerializer, ImageTableSerializer
 from rest_framework.exceptions import NotFound
 from . models import get_grid_from_test, ImageTable, TestReport
@@ -18,7 +19,8 @@ from reportlab.lib.pagesizes import letter
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
-from morgan_hack.settings import EMAIL_HOST_USER
+from morgan_hack.settings import EMAIL_HOST_USER, ORIGIN_IP
+import time
 
 # Create your views here.
 class TestTableView(APIView):
@@ -44,28 +46,26 @@ class ImageTableView(APIView):
         images = [img.filename for img in ImageTable.objects.all()]
         return Response(images)
 
-# @csrf_exempt
 def add_report(request):
     data = request.POST
-    print([
-        data['user_name'],data['email'],data['phone'],data['report']
-    ])
+
     try:
-        TestReport(
-            user_name = data['user_name'],
-            email = data['email'],
-            phone = data['phone'],
-            report = data['report'],
-            test = TestTable.objects.get(id=int(data['test'])),
-        ).save()
+        test_token = TestToken.objects.get(test_token=data["token"])
+        if test_token.valid:
+            TestReport(
+                user_name = data['user_name'],
+                email = data['email'],
+                phone = data['phone'],
+                report = data['report'],
+                test = TestTable.objects.get(id=int(data['test'])),
+            ).save()
+            test_token.valid = False
+            test_token.save()
+        return HttpResponse("OK", status=200)
+
     except Exception as e:
         print(e)
         return HttpResponse("Failed to created", status=400)
-    
-
-    return HttpResponse("ok")
-   
-
 
 def generate_pdf(request):
 
@@ -94,8 +94,29 @@ def generate_pdf(request):
     FileResponse()
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
-def send_activation_email():
-        subject = "New entry"
-        message = f"Hope you will enjoy our platform!\nActivate your account: http://localhost:8080/profile/activation/?code="
-        send_mail(subject, message, EMAIL_HOST_USER, [EMAIL_HOST_USER], fail_silently=False)
-        print("OK!")
+def send_email(subject, message, emails):
+    send_mail(subject, message, EMAIL_HOST_USER, emails, fail_silently=False)
+
+def generate_test(request):
+    data = request.POST
+    try:
+        for user in data['participants']:
+            test_token = TestToken.objects.create(test_token=str(hash(time.time())))
+            send_email(
+                "Welcome to Salva Vita",
+                f"Your test link: {ORIGIN_IP}salva-vita-test/?token={test_token.test_token}&test_id={request.POST['test_id']}"
+                [user],
+            )
+    except Exception as e:
+        print(e)
+        return HttpResponse("Failed", status=400)
+    return HttpResponse("Done", status=200)
+
+def check_token(request):
+    try:
+        token = TestToken.objects.get(token=request.data["token"])
+        return HttpResponse("Valid" if token.valid else "Not valid", status=200)
+    except Exception as e:
+        print(e)
+        return HttpResponse("Token was not found.", status=400)
+    
