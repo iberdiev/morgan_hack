@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . models import ImageTable, TestReport, TestTable
+from . models import ImageTable, TestReport, TestTable, TestToken
 from django.utils.html import format_html
 import io
 from django.http import FileResponse
@@ -36,3 +36,4 @@ class TestTableAdmin(admin.ModelAdmin):
 admin.site.register(ImageTable, ImageAdmin)
 admin.site.register(TestTable, TestTableAdmin)
 admin.site.register(TestReport, TestReportAdmin)
+admin.site.register(TestToken,)

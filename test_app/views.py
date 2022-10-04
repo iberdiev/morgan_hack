@@ -1,7 +1,7 @@
 import code
 from email import message
 from tokenize import Token
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from multiprocessing.dummy import active_children
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -20,8 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
 from morgan_hack.settings import EMAIL_HOST_USER, ORIGIN_IP
-import time
-
+import time, json
 # Create your views here.
 class TestTableView(APIView):
     def get(self, request):
@@ -94,17 +93,20 @@ def generate_pdf(request):
     FileResponse()
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
-def send_email(subject, message, emails):
+def send_email_custom(subject, message, emails):
     send_mail(subject, message, EMAIL_HOST_USER, emails, fail_silently=False)
 
 def generate_test(request):
-    data = request.POST
     try:
-        for user in data['participants']:
+        data = request.POST
+        participants = data['participants'].split(',')
+        test_id = data['test_id']
+        test_id = int(test_id[0])
+        for user in participants:
             test_token = TestToken.objects.create(test_token=str(hash(time.time())))
-            send_email(
+            send_email_custom(
                 "Welcome to Salva Vita",
-                f"Your test link: {ORIGIN_IP}salva-vita-test/?token={test_token.test_token}&test_id={request.POST['test_id']}"
+                f"Your test link: {ORIGIN_IP}salva-vita-test/?token={test_token.test_token}&test_id={test_id}",
                 [user],
             )
     except Exception as e:
@@ -114,9 +116,9 @@ def generate_test(request):
 
 def check_token(request):
     try:
-        token = TestToken.objects.get(token=request.data["token"])
-        return HttpResponse("Valid" if token.valid else "Not valid", status=200)
+        token = TestToken.objects.get(test_token=request.GET['token'])
+        return JsonResponse(json.dumps({"status": "ok" if token.valid else "used"},),  safe=False, status=200)
     except Exception as e:
         print(e)
-        return HttpResponse("Token was not found.", status=400)
+        return JsonResponse(json.dumps({"status": "notok"},),  safe=False, status=400)
     
