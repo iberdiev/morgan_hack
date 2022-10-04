@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+          <div class="container">
+            <a class="navbar-brand" href="./home_page.html">Salva Vita</a>
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="./home_page.html">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="./home_page.html#contact_area">Contact us</a>
+                </li>
+              </ul>
+              
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+    <div class="container m-5">
+        <p class="lead fw-bolder">
+          Please fill out the form!
+        </p>
+        <form class="user_form row g-3">
+            <div class="col-md-12">
+                <label for="inputName" class="form-label">Full name</label>
+                <input type="text" class="form-value form-control" id="name" required>
+              </div>
+            <div class="col-md-12">
+              <label for="inputEmail4" class="form-label">Email</label>
+              <input type="email" class="form-value form-control" id="email" required>
+            </div>
+            <div class="col-12">
+              <label for="inputPhone" class="form-label">Phone num 1</label>
+              <input type="text" class="form-value form-control" id="phone1" placeholder="+36 20 324 32 43" required>
+            </div>
+            <div class="col-12">
+              <label for="inputPhone" class="form-label">Phone num 2</label>
+              <input type="text" class="form-value form-control" id="phone2" placeholder="+36 20 231 23 43">
+            </div>
+            <div class="col-md-12">
+              <label for="inputState" class="form-label">Gender</label>
+              <select id="gender" class="form-value form-select">
+                <option selected>Prefer not to say</option>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input class="form-value form-check-input" type="checkbox" id="remember_me">
+                <label class="form-check-label" for="gridCheck">
+                  Remember me
+                </label>
+              </div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+    </div>
+
+    <script src="../js/constants.js"></script>
+    <script src="../js/events/events.js"></script>
+    <script src="../js/rest_handlers.js"></script>
+    <script src="../js/test_page_skeleton.js"></script>
+    <script src="../js/form_page_logic.js"></script>
+</body>
+</html>

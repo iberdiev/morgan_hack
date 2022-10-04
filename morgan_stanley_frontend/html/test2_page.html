@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+          <a class="navbar-brand" href="./home_page.html">Salva Vita</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="./home_page.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./home_page.html#contact_area">Contact us</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="position-absolute top-2 end-0">
+      <div class="timer my-1 mx-1">
+        <i class="bi bi-alarm mt-2 me-2"></i>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button
+            type="button"
+            class="timer-min btn btn-outline-primary .verdict_button"
+          >
+            00
+          </button>
+          <button type="button" class="timer-sec btn btn-outline-primary">
+            00
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="test2_main_container container w-75 my-5 p-5 bg-light border border-2">
+      <p class="fw-lighter fs-5">Please choose </p>
+      <div class="reference container mb-5"></div>
+      <div class="grid_area container"></div>
+      <div class="d-flex flex-row-reverse">
+        <button type="button" class="mt-5 finish_button btn btn-success btn-lg">
+          Finish
+        </button>
+      </div>
+    </div>
+
+    <script src="../js/constants.js"></script>
+    <script src="../js/utils/timer.js"></script>
+    <script src="../js/events/events.js"></script>
+    <script src="../js/rest_handlers.js"></script>
+    <script src="../js/test_page_skeleton.js"></script>
+    <script src="../js/test2_page_logic.js"></script>
+  </body>
+</html>
