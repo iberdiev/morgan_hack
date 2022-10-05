@@ -15,16 +15,28 @@ class RestApiHandler {
     });
 
     */
-    static async postData(url = '', data = {}) {
+    static async postData(url = '', data = {}, isFormData) {
         // Default options are marked with *
-        const response = await fetch(url, {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: JSON.stringify(data) // body data type must match "Content-Type" header
-        });
+        const response = undefined;
+        if(isFormData) {
+            const formData = new FormData();
+            for (const [key, value] of Object.entries(data)) {
+                formData.append(key, value);
+            }
+            
+            response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                body: formData // body data type must match "Content-Type" header
+            });
+        } else {
+            response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                body: formData // body data type must match "Content-Type" header
+            });
+        }
+
+
+        
         
         return response.json(); // parses JSON response into native JavaScript objects
     }
