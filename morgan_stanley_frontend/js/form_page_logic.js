@@ -22,7 +22,11 @@ class FormPage {
     #packUserData() {
         const testData = JSON.parse(localStorage.getItem('data'));
         const timeFinished = JSON.parse(localStorage.getItem('time_finish'));
+        const token = JSON.parse(localStorage.getItem('token'));
+        const test_id = JSON.parse(localStorage.getItem('test_id'));
 
+        this.#userData['token'] = token;
+        this.#userData['test_id'] = test_id;
         this.#userData['testData'] = testData;
         this.#userData['timeFinished'] = timeFinished;
     }
@@ -42,4 +46,3 @@ class FormPage {
 }
 
 const formPage = new FormPage();
-

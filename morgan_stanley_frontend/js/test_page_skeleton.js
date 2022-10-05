@@ -12,9 +12,7 @@ class TestPage {
         this.timer = new Timer();
         this.chosen = [];
         this.currentMaxRevised = {row: 0, col: 0};
-        this.gridArea = document.querySelector('.grid_area');
-        this.finish_button = document.querySelector('.finish_button');
-        this.finish_button.addEventListener('click', this.saveValuesAndRedirectToFormPage.bind(this));
+        this.finish_button = undefined;
         
         // Catch the event thrown by timer
         document.addEventListener("getInfo", () => {
@@ -109,12 +107,116 @@ class TestPage {
 
     }
 
-    // TODO: change the API endpoint
-    renderGrid() {
-        const queryString = window.location.search;
+    renderHeader() {
+        document.body.innerHTML += `
+            <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="./home_page.html">Salva Vita</a>
+                <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+                >
+                <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./home_page.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="./home_page.html">Contact us</a>
+                    </li>
+                </ul>
+                </div>
+            </div>
+            </nav>
+        </header>
+        `;
+    }
 
-        // Get grid and answers from backend
-        RestApiHandler.getData(API.test_detail+queryString)
+    renderTimer() {
+        document.body.innerHTML += `
+            <div class="position-absolute top-2 end-0">
+            <div class="timer my-1 mx-1">
+            <i class="bi bi-alarm mt-2 me-2"></i>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button
+                type="button"
+                class="timer-min btn btn-outline-primary .verdict_button"
+                >
+                00
+                </button>
+                <button type="button" class="timer-sec btn btn-outline-primary">
+                00
+                </button>
+            </div>
+            </div>
+        </div>
+        `;
+    }
+
+    renderBody(title) {
+        //Please choose ___ and ___ from shown images
+        document.body.innerHTML += `
+            <div class="test1_main_container container mx-auto my-5 p-5 bg-light border border-2">
+                <p class="fw-lighter fs-5">${title}</p>
+                <div class="reference container mb-5"></div>
+                <div class="grid_area container"></div>
+                <div class="d-flex flex-row-reverse">
+                <button type="button" class="finish_button mt-5 btn btn-success btn-lg">
+                    Finish
+                </button>
+                </div>
+            </div>
+        `;
+    }
+
+    loadPage() {
+        this.validateToken();
+    }
+
+    validateToken() {
+        const queryString = window.location.href;
+        const url = new URL(queryString);
+        const token = url.searchParams.get("token");
+        const test_id = url.searchParams.get("test_id");
+        localStorage.setItem('test_id', test_id);
+        localStorage.setItem('token', token);
+        
+        
+        // RestApiHandler.getData(API.check_token + '?token='+token)
+        // .then((data) => {
+        //     const data_obj = JSON.parse(data);
+        //     if(data_obj.status != 'ok') {
+        //         window.location.href = './Invalid_token_page.html';
+        //     }
+
+        //     this.renderHeader();
+        //     this.renderTimer();
+        //     this.renderBody("Please choose ___ and ___ from shown images");
+        //     this.renderGrid(test_id);
+        //     this.finish_button = document.querySelector('.finish_button');
+        // });
+        this.renderHeader();
+        this.renderTimer();
+        this.renderBody("Please choose ___ and ___ from shown images");
+        this.renderGrid(test_id);
+
+        
+        this.finish_button = document.querySelector('.finish_button');
+        this.finish_button.addEventListener('click', this.saveValuesAndRedirectToFormPage.bind(this));
+    }
+
+    renderGrid(test_id) {
+        //Get grid and answers from backend
+        console.log(API.test_detail+'?test_id='+test_id);
+        RestApiHandler.getData(API.test_detail+'?test_id='+test_id)
         .then((data) => {
             this.grid = data.grid;
             this.answers = data.answers;
