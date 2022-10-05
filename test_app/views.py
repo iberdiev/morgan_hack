@@ -14,7 +14,8 @@ import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.units import mm
 
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -60,6 +61,9 @@ def add_report(request):
             ).save()
             test_token.valid = False
             test_token.save()
+            if test_token.send_results:
+                pass
+
         return HttpResponse("OK", status=200)
 
     except Exception as e:
@@ -72,19 +76,20 @@ def generate_pdf(request):
     report_lines = report_obj.report.replace('\r', '').split('\n')
     
     buffer = io.BytesIO()
-    p = canvas.Canvas(buffer, pagesize = letter)
-    template = ImageReader('./report_templates/1.png')
-    p.drawImage(template,10,10,mask='auto')
-    
-    p.drawString(100, 800, f"Name: {report_obj.user_name}")
-    p.drawString(100,770, f"Email: {report_obj.email}")
-    p.drawString(100,740, f"Phone: {report_obj.phone}")
-    p.drawString(100,710, f"Date: {report_obj.date}")
-    p.drawString(100,680, f"Test: {report_obj.test.name}")
-    p.drawString(100,650, "Report: ")
+    p = canvas.Canvas(buffer)
+    image = ImageReader('./report_templates/1.png')
+    height, width = image.getSize()
+    customMargin = -200
+    p.drawImage(image,-80, -80, width=760, height=1000,)
+    p.drawString(100,800 + customMargin, f"Name: {report_obj.user_name}")
+    p.drawString(100,770 + customMargin, f"Email: {report_obj.email}")
+    p.drawString(100,740 + customMargin, f"Phone: {report_obj.phone}")
+    p.drawString(100,710 + customMargin, f"Date: {report_obj.date}")
+    p.drawString(100,680 + customMargin, f"Test: {report_obj.test.name}")
+    p.drawString(100,650 + customMargin, "Test results: ")
     curr = 650
     for line in report_lines:
-        p.drawString(150,curr, line)
+        p.drawString(150,curr + customMargin, line)
         curr -= 10
 
     p.showPage()
@@ -103,11 +108,16 @@ def generate_test(request):
         test_id = data['test_id']
         test_id = int(test_id[0])
         for user in participants:
-            test_token = TestToken.objects.create(test_token=str(hash(time.time())))
+            test_token = TestToken.objects.create(
+                test_token=str(hash(time.time())),
+                email=user.split(),
+                test=TestTable.objects.get(pk=test_id)
+
+            )
             send_email_custom(
                 "Welcome to Salva Vita",
                 f"Your test link: {ORIGIN_IP}salva-vita-test/?token={test_token.test_token}&test_id={test_id}",
-                [user],
+                [user.split()],
             )
     except Exception as e:
         print(e)

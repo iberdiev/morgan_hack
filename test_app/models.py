@@ -4,7 +4,7 @@ from xmlrpc.client import Boolean
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
-from django.forms import CharField
+from django.forms import BooleanField, CharField
 import time 
 # Create your models here.
 def get_grid_from_test(test):
@@ -76,3 +76,8 @@ def pre_save_user(sender, instance, **kwargs):
 class TestToken(models.Model):
     test_token = models.CharField(unique=True, blank=False, null=False, max_length=200)
     valid = models.BooleanField(default=True)
+    email = models.CharField(max_length=100)
+    send_results = models.BooleanField(default=False)
+    test = models.ForeignKey(TestTable, on_delete=models.SET_NULL, null=True)
+    def __str__(self):
+        return f'{self.email} | {"pending" if self.valid else "took"} | {self.test.name if self.test else ""} |{"" if self.send_results else "not " }sending results'
