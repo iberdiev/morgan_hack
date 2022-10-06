@@ -99,8 +99,9 @@ class TestPage {
 
         const updateCurrentMaxRevised = () => {
             const idx = element.id.split('_');
-            const row = idx[0];
-            const col = idx[1];
+            const row = Number.parseInt(idx[0]);
+            const col = Number.parseInt(idx[1]);
+            console.log(row, col)
             if(this.currentMaxRevised.row < row) {
                 this.currentMaxRevised.row = row;
                 this.currentMaxRevised.col = col;
@@ -108,6 +109,7 @@ class TestPage {
                 this.currentMaxRevised.col 
                         = Math.max(this.currentMaxRevised.col, col);
             }
+            console.log(this.currentMaxRevised)
         }
 
         updateCurrentMaxRevised();
@@ -138,7 +140,7 @@ class TestPage {
                 aria-label="Toggle navigation"
                 >
             </div>
-            <div class=" timer my-auto" style="margin-left: 30em">
+            <div class=" timer my-auto" style="margin-left: 36%">
                 <i class="bi bi-alarm mt-2 me-2"></i>
                 <div class="btn-group" role="group" aria-label="Basic example">
                     <button
@@ -158,11 +160,11 @@ class TestPage {
         `;
     }
 
-    renderBody(title) {
+    renderBody() {
         //Please choose ___ and ___ from shown images
         document.body.innerHTML += `
             <div class="test1_main_container container mx-auto my-5 p-5 bg-light border border-2">
-                <p class="fw-lighter fs-5">${title}</p>
+                <p class="fw-lighter fs-5"><span class="title fw-bold"></span></p>
                 <div class="reference container mb-5"></div>
                 <div class="grid_area container"></div>
                 <div class="d-flex flex-row-reverse">
@@ -186,27 +188,20 @@ class TestPage {
         localStorage.setItem('test_id', test_id);
         localStorage.setItem('token', token);
         
-        // RestApiHandler.getData(API.check_token + '?token='+token)
-        // .then((data) => {
-        //     const data_obj = JSON.parse(data);
-        //     if(data_obj.status != 'ok') {
-        //         window.location.href = './test_completed_page.html';
-        //     }
+        RestApiHandler.getData(API.check_token + '?token='+token)
+        .then((data) => {
+            const data_obj = JSON.parse(data);
+            if(data_obj.status != 'ok') {
+                window.location.href = './test_completed_page.html';
+            }
 
-        //     this.renderHeader();
-        //     this.renderTimer();
-        //     this.renderBody("Please choose ___ and ___ from shown images");
-        //     this.renderGrid(test_id);
-        //     this.finish_button = document.querySelector('.finish_button');
-        // });
-        this.renderHeader();
-        this.renderBody("Please choose ___ and ___ from shown images");
-        this.renderGrid(test_id);
-        this.startTimer();
-
-        
-        this.finish_button = document.querySelector('.finish_button');
-        this.finish_button.addEventListener('click', this.saveValuesAndRedirectToFormPage.bind(this));
+            this.renderHeader();
+            this.renderBody();
+            this.renderGrid(test_id);
+            this.startTimer();
+            this.finish_button = document.querySelector('.finish_button');
+            this.finish_button.addEventListener('click', this.saveValuesAndRedirectToFormPage.bind(this));
+        });
     }
 
     renderGrid(test_id) {
@@ -215,6 +210,7 @@ class TestPage {
         .then((data) => {
             this.grid = data.grid;
             this.answers = data.answers;
+            document.querySelector('.title').innerText = data.prompt;
         })
         .then(() => this.generateGrid());
     }

@@ -19,6 +19,12 @@ img {
     height: auto;
 }
 
+.proper {
+    border-style: solid;
+    border-color: brown;
+    border-width: 0.2em;
+}
+
 .border-selected {
     filter: grayscale(100%) brightness(80%) sepia(300%) hue-rotate(50deg) saturate(500%);
 }

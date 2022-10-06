@@ -150,7 +150,9 @@ class TestThreePage extends TestPage {
         gridArea.innerHTML = grid_html;
     
         for(let row=0;row<this.grid.length;++row) {
-            for(let col=0;col<this.grid[0].length;++col) {
+            gridArea.querySelector(`[id="${row}_0"]`).classList.add('proper');
+
+            for(let col=1;col<this.grid[0].length;++col) {
                 gridArea.querySelector(`[id="${row}_${col}"]`).addEventListener('click', this.onImageClick.bind(this))
             }
         }
