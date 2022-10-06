@@ -20,7 +20,7 @@ from reportlab.lib.units import mm
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
-from morgan_hack.settings import EMAIL_HOST_USER, ORIGIN_IP
+from morgan_hack.settings import EMAIL_HOST_USER, ORIGIN_IP, FRONTEND_IP
 import time, json
 # Create your views here.
 class TestTableView(APIView):
@@ -38,7 +38,7 @@ class TestTableDetailView(APIView):
             raise NotFound(detail="Error 404, Test not found", code=404)
 
         grid = get_grid_from_test(test)
-        return Response({"grid": grid, "answers": test.answers.replace(' ', '').split(',')})
+        return Response({"grid": grid, "prompt": test.prompt, "answers": test.answers.replace(' ', '').split(',')})
 
 
 class ImageTableView(APIView):
@@ -86,10 +86,10 @@ def add_report(request):
             
             avgPicPerMinRev = sum(pictures_revised_per_minute_list) / len(pictures_revised_per_minute_list)
             avgDistNOfPicRevPerMin = sum([abs(n-avgPicPerMinRev) for n in pictures_revised_per_minute_list]) / len(pictures_revised_per_minute_list)
-            report += f'\nThe average difference between the number of revised pictures/each minute is: {avgDistNOfPicRevPerMin} pieces'
-            report += '\nIf the differences between the minute results are higher than 20, it reflects a fluctuating attention'
-            report += '\nIf the last minute performance is very good, it refers to a strong motivation and desire to conform'
-            report += '\nIf the last minute performance is very poor, it refers to fatigue'
+            report += f'\nThe average difference between the number of revised \npictures/each minute is: {avgDistNOfPicRevPerMin} pieces\n'
+            report += '\nIf the differences between the minute results are \nhigher than 20, it reflects a fluctuating attention\n'
+            report += '\nIf the last minute performance is very good, it refers\n to a strong motivation and desire to conform\n'
+            report += '\nIf the last minute performance is very poor, it refersto fatigue'
             
         elif test_report.test.name == 'Toulouse-Piéron Cancelation Test (Visio-perceptual)':
             pictures_revised_total = int(test_data[str(0)]['current_max_revised']['row']) * test_report.test.cols + int(test_data[str(0)]['current_max_revised']['col'])
@@ -134,7 +134,7 @@ def add_report(request):
         test_token.valid = False
         test_token.save()
         if test_token.send_results:
-            pass
+            send_email_custom("Salva Vita Test Results", report, [test_report.email.split()])
 
     return JsonResponse(json.dumps({"status": "ok"}), status=200, safe=False)
 
@@ -159,10 +159,10 @@ def generate_pdf(request):
     p.drawString(100,710 + customMargin, f"Date: {report_obj.date}")
     p.drawString(100,680 + customMargin, f"Test: {report_obj.test.name}")
     p.drawString(100,650 + customMargin, "Test results: ")
-    curr = 650
+    curr = 630
     for line in report_lines:
-        p.drawString(150,curr + customMargin, line)
-        curr -= 10
+        p.drawString(100,curr + customMargin, line)
+        curr -= 20
 
     p.showPage()
     p.save()
@@ -188,7 +188,7 @@ def generate_test(request):
             )
             send_email_custom(
                 "Welcome to Salva Vita",
-                f"Your test link: {ORIGIN_IP}salva-vita-test/?token={test_token.test_token}&test_id={test_id}",
+                f"Your test link: {FRONTEND_IP}html/test_page.html/?token={test_token.test_token}&test_id={test_id}",
                 [user.split()],
             )
     except Exception as e:

@@ -25,6 +25,7 @@ class TestTable(models.Model):
     answers = models.CharField(max_length=500)
     rows = models.IntegerField()
     cols = models.IntegerField()
+    prompt = models.TextField(max_length=1000)
     
     def __str__(self):
         return self.name
