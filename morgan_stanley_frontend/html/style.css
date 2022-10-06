@@ -60,6 +60,10 @@ img {
     margin-bottom:0 !important;
 }
 
+.no-click {
+    pointer-events: none;
+}
+
 .navbar {
     opacity: 1 !important;
 }
@@ -75,3 +79,6 @@ img {
     opacity: 1;
  }
 
+ .disabled {
+    opacity: 0.5;
+ }

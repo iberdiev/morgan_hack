@@ -12,7 +12,8 @@ class FormPage {
         event.preventDefault();
         this.#getUserData();
         this.#packUserData();
-        console.log(this.#userData);
+        this.#sendUserData();
+        window.location.href = "./test_completed_page.html";
     }
 
     #getUserData () {
@@ -20,10 +21,10 @@ class FormPage {
     }
 
     #packUserData() {
-        const testData = JSON.parse(localStorage.getItem('data'));
-        const timeFinished = JSON.parse(localStorage.getItem('time_finish'));
-        const token = JSON.parse(localStorage.getItem('token'));
-        const test_id = JSON.parse(localStorage.getItem('test_id'));
+        const testData = localStorage.getItem('data');
+        const timeFinished = localStorage.getItem('time_finish');
+        const token = localStorage.getItem('token');
+        const test_id = localStorage.getItem('test_id');
 
         this.#userData['token'] = token;
         this.#userData['test_id'] = test_id;
@@ -32,16 +33,13 @@ class FormPage {
     }
 
     #sendUserData() {
-        
-        postData('https://example.com/answer', )
-        .then((response) => response.blob())
+        RestApiHandler.postData(API.send_report, this.#userData, true)
         .then((data) => {
             console.log(data); // JSON data parsed by `data.json()` call
         })
         .catch((error) => {
             console.error('Error:', error);
         });
-
     }
 }
 

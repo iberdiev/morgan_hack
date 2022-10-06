@@ -17,7 +17,7 @@ class RestApiHandler {
     */
     static async postData(url = '', data = {}, isFormData) {
         // Default options are marked with *
-        const response = undefined;
+        let response = undefined;
         if(isFormData) {
             const formData = new FormData();
             for (const [key, value] of Object.entries(data)) {
@@ -31,12 +31,10 @@ class RestApiHandler {
         } else {
             response = await fetch(url, {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                body: formData // body data type must match "Content-Type" header
+                body: data // body data type must match "Content-Type" header
             });
         }
 
-
-        
         
         return response.json(); // parses JSON response into native JavaScript objects
     }

@@ -8,9 +8,7 @@ class TestPage {
         this.currentIndex = 0;
         this.grid = [];
         this.answers = [];
-        this.correct_cells = []
         this.timer = new Timer();
-        this.chosen = [];
         this.currentMaxRevised = {row: 0, col: 0};
         this.finish_button = undefined;
         
@@ -26,58 +24,47 @@ class TestPage {
     saveValuesAndRedirectToFormPage() {
         this.countIncorrectAndRevised();
         localStorage.setItem('data', JSON.stringify(this.data));
-        console.log(this.timer);
         localStorage.setItem('time_finish', JSON.stringify({minute: this.timer.getTimeInMinutes(), second: this.timer.getTimeInSeconds()}));
-        window.location.replace("./form_page.html");
+        window.location.href = "./form_page.html";
     }
 
     countIncorrectAndRevised() {
-        // Sort the cells in asc i.e. [0_1, 1_1, 1_2...]
-        this.chosen.sort();
+        const gridArea = document.querySelector('.grid_area');
 
-        const getGridValue = (str) => {
-            const obj = convertStrIndToObj(str);
-            return this.grid[obj.row][obj.col];
+        const isSelected = (i, j) => {
+            return gridArea
+                    .querySelector(`[id="${i}_${j}"]`)
+                    .classList
+                    .contains('selected');
+
         }
-
-        const convertStrIndToObj = (str) => {
-            const indexes = str.split('_');
-            return {row: indexes[0], col: indexes[1]};
-        }
-
-        const convertObjToStrInd = (obj) => {
-            return `${obj.row}_${obj.col}`;
-        }
-
-        const getMaxIndexSoFar = () => {
-            if(this.chosen.length == 0) return;
-
-            const newObjInd = convertStrIndToObj(this.chosen[this.chosen.length-1]);
-            if(newObjInd.row > this.currentMaxRevised.row) {
-                this.currentMaxRevised = newObjInd;
-            } else if (newObjInd.row == this.currentMaxRevised.row) {
-                this.currentMaxRevised = 
-                        newObjInd.col > this.currentMaxRevised.col ?
-                            newObjInd : this.currentMaxRevised;
-            }
-        }
-
-        // Refresh max index
-        getMaxIndexSoFar();
 
         const getIncorrectSoFar = () => {
-            const missed = this.correct_cells
-                            .filter(e => e <= convertObjToStrInd(this.currentMaxRevised))
-                            .filter(e => !this.chosen.includes(e))
-                            .length;
+            let missed = 0;
+            let incorrect_selected = 0;
+            for(let i=0;i<this.grid.length;i++) {
+                for(let j=0;j<this.grid[0].length;j++) {
+                    const obj = {'missed': missed, 'incorrect_selected': incorrect_selected, 'current_max_revised': this.currentMaxRevised};
+                    if (this.currentMaxRevised.row < i) {
+                        return obj;
+                    }
+                    else if ((this.currentMaxRevised.row == i) && (j > this.currentMaxRevised.col )) {
+                        return obj;
+                    }
 
-            const incorrect_selected = this.chosen
-                                        .filter(e => !this.answers.includes(getGridValue(e)))
-                                        .length;
+                    if(isSelected(i, j)) {
+                        if(!this.answers.includes(this.grid[i][j]))
+                            incorrect_selected++;
+                    } else {
+                        if(this.answers.includes(this.grid[i][j]))
+                            missed++;
+                    }
 
-            return {'missed': missed, 'incorrect_selected': incorrect_selected};
+                }
+                
+            }
+            
         }
-
 
         this.data[this.currentIndex] = getIncorrectSoFar();
         this.currentIndex++;
@@ -92,27 +79,55 @@ class TestPage {
         }, 100)
     }
 
+    #disableAllPreviousRows() {
+        const gridArea = document.querySelector('.grid_area');
+
+        for(let i=0;i<this.grid.length;i++) {
+            for(let j=0;j<this.grid[0].length;++j) {
+                if(this.currentMaxRevised.row == i)
+                    return;
+
+                gridArea
+                    .querySelector(`[id="${i}_${j}"]`)
+                    .classList.add('disabled');
+            }
+        }
+    }
+
     onImageClick(event) {
         const element = event.target;
-        
-        if(element.classList.contains('selected')) {
-            this.chosen = this.chosen.filter(e => e != element.id);
-        } else {
-            this.chosen.push(element.id)
+
+        const updateCurrentMaxRevised = () => {
+            const idx = element.id.split('_');
+            const row = idx[0];
+            const col = idx[1];
+            if(this.currentMaxRevised.row < row) {
+                this.currentMaxRevised.row = row;
+                this.currentMaxRevised.col = col;
+            } else if(this.currentMaxRevised.row == row) {
+                this.currentMaxRevised.col 
+                        = Math.max(this.currentMaxRevised.col, col);
+            }
         }
+
+        updateCurrentMaxRevised();
+
+        if(element.classList.contains('disabled'))
+            return;
+
+        this.#disableAllPreviousRows()
 
         TestPage.SELECTED.forEach(elem => 
             event.target.classList.toggle(elem)
         )
-
     }
 
     renderHeader() {
         document.body.innerHTML += `
             <header>
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand" href="./home_page.html">Salva Vita</a>
+            <div class="ms-5">
+                <a class="navbar-brand" href="#">Salva Vita</a>
                 <button
                 class="navbar-toggler"
                 type="button"
@@ -122,42 +137,24 @@ class TestPage {
                 aria-expanded="false"
                 aria-label="Toggle navigation"
                 >
-                <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="./home_page.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link" href="./home_page.html">Contact us</a>
-                    </li>
-                </ul>
+            </div>
+            <div class=" timer my-auto" style="margin-left: 30em">
+                <i class="bi bi-alarm mt-2 me-2"></i>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button
+                    type="button"
+                    class="timer-min btn btn-outline-dark .verdict_button"
+                    >
+                    00
+                    </button>
+                    <button type="button" class="timer-sec btn btn-outline-dark">
+                    00
+                    </button>
                 </div>
             </div>
+            
             </nav>
-        </header>
-        `;
-    }
-
-    renderTimer() {
-        document.body.innerHTML += `
-            <div class="position-absolute top-2 end-0">
-            <div class="timer my-1 mx-1">
-            <i class="bi bi-alarm mt-2 me-2"></i>
-            <div class="btn-group" role="group" aria-label="Basic example">
-                <button
-                type="button"
-                class="timer-min btn btn-outline-primary .verdict_button"
-                >
-                00
-                </button>
-                <button type="button" class="timer-sec btn btn-outline-primary">
-                00
-                </button>
-            </div>
-            </div>
-        </div>
+            </header>
         `;
     }
 
@@ -189,12 +186,11 @@ class TestPage {
         localStorage.setItem('test_id', test_id);
         localStorage.setItem('token', token);
         
-        
         // RestApiHandler.getData(API.check_token + '?token='+token)
         // .then((data) => {
         //     const data_obj = JSON.parse(data);
         //     if(data_obj.status != 'ok') {
-        //         window.location.href = './Invalid_token_page.html';
+        //         window.location.href = './test_completed_page.html';
         //     }
 
         //     this.renderHeader();
@@ -204,9 +200,9 @@ class TestPage {
         //     this.finish_button = document.querySelector('.finish_button');
         // });
         this.renderHeader();
-        this.renderTimer();
         this.renderBody("Please choose ___ and ___ from shown images");
         this.renderGrid(test_id);
+        this.startTimer();
 
         
         this.finish_button = document.querySelector('.finish_button');
@@ -215,7 +211,6 @@ class TestPage {
 
     renderGrid(test_id) {
         //Get grid and answers from backend
-        console.log(API.test_detail+'?test_id='+test_id);
         RestApiHandler.getData(API.test_detail+'?test_id='+test_id)
         .then((data) => {
             this.grid = data.grid;
