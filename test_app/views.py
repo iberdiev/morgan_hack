@@ -101,25 +101,27 @@ def add_report(request):
             else: report += 'attention disorder'
 
         elif test_report.test.name == 'Bourdon (Visio-perceptual)':
-            t = test_data['timeFinished'] ## seconds
-            N = test_data['current_max_revised']['row'] * test_report.test.cols + test_data['current_max_revised']['col']
-            C = test_data['current_max_revised']['row'] + 1
-            n = test_data['correct'] + test_data['missed']
-            M = test_data['correct'] + test_data['incorrect_selected']
-            S = test_data['correct']
-            P = test_data['missed']
-            O = test_data['incorrect_selected']
+            print(test_data)
+            # t = test_data['timeFinished'] ## seconds
+            t = 12
+            N = int(test_data['0']['current_max_revised']['row']) * test_report.test.cols + int(test_data['0']['current_max_revised']['col'])
+            C = int(test_data['0']['current_max_revised']['row']) + 1
+            n = int(test_data['0']['correct']) + int(test_data['0']['missed'])
+            M = int(test_data['0']['correct'] + test_data['0']['incorrect'])
+            S = int(test_data['0']['correct'])
+            P = int(test_data['0']['missed'])
+            O = int(test_data['0']['incorrect'])
 
             A = N / t
-            T1 = M/n
-            T2 = S/n
-            T3 = (M-O)/(M+P)
+            T1 = M/n if n else 0
+            T2 = S/n if n else 0
+            T3 = (M-O)/(M+P) if (M+P) else 0
             E = N*T2
             Au = (N/t)*((M-(O+P))/n)
-            K = ((M-O)*100)/n
+            K = ((M-O)*100)/n if n else 0
             Ku = C*(C/(P+O+(0 if (P+O) else 1)))
             V = 0.5936*N
-            Q=(V-2.807*(P+Q))/t
+            Q=(V-2.807*(P+O))/t
             report += f'Attention Level: {Q}'
             report += f'\nStability of concentration of attention: {Ku}; '
             if Ku >= 172: report += 'Very high'
@@ -134,7 +136,7 @@ def add_report(request):
         test_token.valid = False
         test_token.save()
         if test_token.send_results:
-            send_email_custom("Salva Vita Test Results", report, [test_report.email.split()])
+            send_email_custom("Salva Vita Test Results", report, [test_token.email])
 
     return JsonResponse(json.dumps({"status": "ok"}), status=200, safe=False)
 
@@ -171,25 +173,26 @@ def generate_pdf(request):
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
 def send_email_custom(subject, message, emails):
-    send_mail(subject, message, EMAIL_HOST_USER, emails, fail_silently=False)
+    print(message)
+    # send_mail(subject, message, EMAIL_HOST_USER, emails, fail_silently=False)
 
 def generate_test(request):
     try:
-        data = request.POST
+        data = request.POST.dict()
         participants = data['participants'].split(',')
         test_id = data['test_id']
         test_id = int(test_id[0])
         for user in participants:
             test_token = TestToken.objects.create(
                 test_token=str(hash(time.time())),
-                email=user.split(),
+                email=user,
                 test=TestTable.objects.get(pk=test_id)
 
             )
             send_email_custom(
                 "Welcome to Salva Vita",
-                f"Your test link: {FRONTEND_IP}html/test_page.html/?token={test_token.test_token}&test_id={test_id}",
-                [user.split()],
+                f"Your test link: {FRONTEND_IP}morgan_hack/morgan_stanley_frontend/html/test_page.html?token={test_token.test_token}&test_id={test_id}",
+                [user],
             )
     except Exception as e:
         print(e)

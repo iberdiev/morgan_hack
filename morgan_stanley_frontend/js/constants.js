@@ -1,4 +1,4 @@
-const IP = 'http://10.149.244.24:8000'
+const IP = 'http://127.0.0.1:8000'
 //10.149.244.24
 const API = {
     tests: IP + '/tests/',
