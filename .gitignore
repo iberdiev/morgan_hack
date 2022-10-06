@@ -3,3 +3,4 @@ test_app/ pycache
 test_app/__pycache__
 morgan_hack/__pycache__
 test_app/migrations/__pycache__
+.env

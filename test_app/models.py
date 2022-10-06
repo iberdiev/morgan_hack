@@ -1,5 +1,6 @@
 from email.policy import default
 from enum import unique
+from unittest.util import _MAX_LENGTH
 from xmlrpc.client import Boolean
 from django.db import models
 from django.dispatch import receiver
@@ -22,6 +23,8 @@ class TestTable(models.Model):
     grid = models.TextField(max_length=200000)
     active = models.BooleanField(default=False)
     answers = models.CharField(max_length=500)
+    rows = models.IntegerField()
+    cols = models.IntegerField()
     
     def __str__(self):
         return self.name
@@ -33,7 +36,9 @@ class TestReport(models.Model):
     test = models.ForeignKey(TestTable, on_delete=models.SET_NULL, null=True)
     report = models.TextField(max_length=5000, blank=True, null=True)
     date = models.DateField('date_created', auto_now_add = True, null=True)
-
+    gender = models.CharField(max_length=100)
+    time_taken = models.CharField(max_length=100)
+    
     def __str__(self) -> str:
         return f"{self.user_name} took {self.test} on {self.date}"
 
@@ -71,6 +76,10 @@ def pre_save_user(sender, instance, **kwargs):
 
     if not valid:
         raise Exception('OMG')
+    
+    instance.rows = rows
+    instance.cols = cols
+    
 
 
 class TestToken(models.Model):

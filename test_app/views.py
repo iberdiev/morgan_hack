@@ -10,7 +10,7 @@ from . models import TestTable, TestReport, TestToken
 from . serializers import TestTableSerializer, ImageTableSerializer
 from rest_framework.exceptions import NotFound
 from . models import get_grid_from_test, ImageTable, TestReport
-import io
+import io, math
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
@@ -47,28 +47,100 @@ class ImageTableView(APIView):
         return Response(images)
 
 def add_report(request):
-    data = request.POST
+    data = request.POST.dict()
+    time_taken = eval(data['timeFinished'])
+    # try:
+    test_token = TestToken.objects.get(test_token=data["token"])
+    if test_token.valid:
+        test_report = TestReport(
+            user_name = data['name'],
+            gender = data['gender'],
+            email = data['email'],
+            time_taken = f"{time_taken['minute']} min {time_taken['second']} sec",
+            phone = data['phone1'],
+            test = TestTable.objects.get(id=int(data['test_id'])),
+        )
 
-    try:
-        test_token = TestToken.objects.get(test_token=data["token"])
-        if test_token.valid:
-            TestReport(
-                user_name = data['user_name'],
-                email = data['email'],
-                phone = data['phone'],
-                report = data['report'],
-                test = TestTable.objects.get(id=int(data['test'])),
-            ).save()
-            test_token.valid = False
-            test_token.save()
-            if test_token.send_results:
-                pass
+        test_data = eval(data['testData'])
+        report = ''
+        total_errors = 0
+        pictures_revised_total = 0
+        pictures_revised_per_minute_list = []
+        if test_report.test.name == 'Chair-lamp (Visio-perceptual abilities)':
+            for i in range(6):
+                if str(i) not in test_data: break
+                curr_errors = test_data[str(i)]['incorrect_selected']+test_data[str(i)]['missed']
+                total_errors += curr_errors
+                revised = int(test_data[str(i)]['current_max_revised']['row']) * test_report.test.cols + int(test_data[str(i)]['current_max_revised']['col'])
+                pictures_revised_per_minute = revised - pictures_revised_total
+                pictures_revised_per_minute_list += [pictures_revised_per_minute]
+                pictures_revised_total = max(pictures_revised_total, revised)
+                report += f"Minute: {i}; Revised: {revised}; Errors: {curr_errors}; QualOfAttent: {curr_errors/pictures_revised_per_minute * 100}"
+            report += f"\nQualOfAttentTotal: {total_errors/pictures_revised_total * 100}"
+            report += f"\nExtentOfAttention: {max(pictures_revised_per_minute_list)-min(pictures_revised_per_minute_list)}"
+            performance_score = (pictures_revised_total-total_errors)/pictures_revised_total*100
+            report += f"\nPerformance: {performance_score}%; Verdict: "
+            if performance_score >=97: report += 'OK'
+            elif performance_score >= 95: report += 'Under the average'
+            else: report += 'attention disorder'
+            
+            avgPicPerMinRev = sum(pictures_revised_per_minute_list) / len(pictures_revised_per_minute_list)
+            avgDistNOfPicRevPerMin = sum([abs(n-avgPicPerMinRev) for n in pictures_revised_per_minute_list]) / len(pictures_revised_per_minute_list)
+            report += f'\nThe average difference between the number of revised pictures/each minute is: {avgDistNOfPicRevPerMin} pieces'
+            report += '\nIf the differences between the minute results are higher than 20, it reflects a fluctuating attention'
+            report += '\nIf the last minute performance is very good, it refers to a strong motivation and desire to conform'
+            report += '\nIf the last minute performance is very poor, it refers to fatigue'
+            
+        elif test_report.test.name == 'Toulouse-Piéron Cancelation Test (Visio-perceptual)':
+            pictures_revised_total = int(test_data[str(0)]['current_max_revised']['row']) * test_report.test.cols + int(test_data[str(0)]['current_max_revised']['col'])
+            total_errors = int(test_data[str(0)]['missed']) + int(test_data['0']['incorrect_selected'])
+            performance_score = (pictures_revised_total-total_errors)/pictures_revised_total*100
+            report += f"\nPerformance: {performance_score}%; Verdict: "
+            if performance_score >=97: report += 'OK'
+            elif performance_score >= 95: report += 'Under the average'
+            else: report += 'attention disorder'
 
-        return HttpResponse("OK", status=200)
+        elif test_report.test.name == 'Bourdon (Visio-perceptual)':
+            t = test_data['timeFinished'] ## seconds
+            N = test_data['current_max_revised']['row'] * test_report.test.cols + test_data['current_max_revised']['col']
+            C = test_data['current_max_revised']['row'] + 1
+            n = test_data['correct'] + test_data['missed']
+            M = test_data['correct'] + test_data['incorrect_selected']
+            S = test_data['correct']
+            P = test_data['missed']
+            O = test_data['incorrect_selected']
 
-    except Exception as e:
-        print(e)
-        return HttpResponse("Failed to created", status=400)
+            A = N / t
+            T1 = M/n
+            T2 = S/n
+            T3 = (M-O)/(M+P)
+            E = N*T2
+            Au = (N/t)*((M-(O+P))/n)
+            K = ((M-O)*100)/n
+            Ku = C*(C/(P+O+(0 if (P+O) else 1)))
+            V = 0.5936*N
+            Q=(V-2.807*(P+Q))/t
+            report += f'Attention Level: {Q}'
+            report += f'\nStability of concentration of attention: {Ku}; '
+            if Ku >= 172: report += 'Very high'
+            elif Ku >= 96.1: report += 'High'
+            elif Ku >= 50.7: report += 'Average'
+            else: report += 'Low'
+
+        
+        test_report.report = report
+        test_report.save()
+
+        test_token.valid = False
+        test_token.save()
+        if test_token.send_results:
+            pass
+
+    return JsonResponse(json.dumps({"status": "ok"}), status=200, safe=False)
+
+    # except Exception as e:
+    #     print(e)
+    #     return JsonResponse(json.dumps({"status": "bad"}), status=400, safe=False)
 
 def generate_pdf(request):
 
